@@ -1,0 +1,327 @@
+ nohup ./domain.sh -domain-config=domain.xml --host-config=192168010X-host.xml &
+
+kill -9 `ps -ef |grep java | awk -F' ' '{print $2 " " $3}'`
+
+
+%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%e%n
+
+
+jboss.server.log.dir
+
+.yyyy-MM-dd
+
+
+PATTERN
+
+Server-one_PeriodSizeRotating
+
+
+
+ <secret value="cmVkaGF0QDE=" />
+
+/opt/jboss/Node1domain/configuration/
+
+
+
+Updated user 'admin' to file '/opt/jboss/Node1domain/configuration/mgmt-users.properties'
+Updated user 'admin' with groups  to file '/opt/jboss/Node1domain/configuration/mgmt-groups.properties'
+
+
+./domain.sh --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+./add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node1domain/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties 
+
+
+./add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node2domain/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties 
+
+EAP_HOME/bin/domain.sh -domain-config=Node2_domain.xml --host-config=Node2_host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain/configuration -Djboss.domain.master.address=192.168.0.106 -Djboss.management.native.port=9999
+
+
+
+[root@localhost bin]# cat StartNode1.sh
+#!/bin/sh
+
+#nohup su - u root ./domain.sh -domain-config=domain.xml --host-config=host.xml &
+#nohup su -u root  EAP_HOME/bin/domain.sh --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+
+
+./domain.sh --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+[root@localhost bin]#
+[root@localhost bin]#
+[root@localhost bin]# cat StartNode2.sh
+#!/bin/sh
+
+#nohup su - u root ./domain.sh -domain-config=domain.xml --host-config=host.xml &
+#noup su -u root  EAP_HOME/bin/domain.sh --domain-config=Node2_domain.xml --host-config=Node2_host.xml -Djboss.domain.base.dir=/opt/jboss/Node2domain
+
+#./add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node2domain/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties
+
+./domain.sh -domain-config=Node2_domain.xml --host-config=Node2_host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain -Djboss.domain.master.address=192.168.0.106 -Djboss.management.native.port=9999
+[root@localhost bin]#
+[root@localhost bin]#
+
+
+
+-domain-config=Node2_domain.xml --host-config=Node2_host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain -Djboss.domain.master.address=192.168.0.106 
+
+
+
+
+ ps -ef |grep java | awk -F ' ' '{print $2 " " $3}'
+
+kill -9 `ps -ef |grep java | awk -F ' ' '{print $2 " " $3}'`
+
+
+
+DC
+hostnamectl set-hostname Jboss-DC
+
+copy domain dir as Node1domain , you can rename domain dir also.
+
+[root@localhost bin]# cat StartNode1.sh
+#!/bin/sh
+
+#nohup su - u root ./domain.sh -domain-config=domain.xml --host-config=host.xml &
+#nohup su -u root  EAP_HOME/bin/domain.sh --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+
+
+./domain.sh --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+[root@localhost bin]#
+
+[root@localhost jboss]# pwd
+/opt/jboss
+[root@localhost jboss]# ll
+total 512
+drwxrwxr-x. 3 root root     27 Jan  7  2019 appclient
+drwxrwxr-x. 4 root root   4096 Dec  5 11:09 bin
+drwxrwxr-x. 5 root root     52 Jan  7  2019 docs
+drwxrwxr-x. 4 root root     38 Jan  7  2019 domain_notinuse
+-rw-rw-r--. 1 root root    419 Jan  7  2019 JBossEULA.txt
+-rw-rw-r--. 1 root root 480958 Jan  7  2019 jboss-modules.jar
+-rw-rw-r--. 1 root root  26530 Jan  7  2019 LICENSE.txt
+drwxrwxr-x. 3 root root     44 Jan  7  2019 migration
+drwxrwxr-x. 3 root root     20 Jan  7  2019 modules
+drwxrwxr-x. 7 root root     76 Dec  5 08:30 Node1domain     <<<
+drwxrwxr-x. 6 root root     68 Jan  7  2019 standalone
+-rw-rw-r--. 1 root root     64 Jan  7  2019 version.txt
+drwxrwxr-x. 4 root root    173 Jan  7  2019 welcome-content
+
+cd /opt/jboss/bin/add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node1domain/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties
+
+
+Copy host-master.xml Node1_host-master.xml
+
+      3 <host xmlns="urn:jboss:domain:8.0" name="DC-master">
+
+     54         <management-interfaces>
+     55             <native-interface security-realm="ManagementRealm">
+     56                 <socket interface="management" port="${jboss.management.native.port:9999}"/>
+     57             </native-interface>
+     58             <http-interface security-realm="ManagementRealm">
+     59                 <http-upgrade enabled="true"/>
+     60                 <socket interface="management" port="${jboss.management.http.port:9990}"/>
+     61             </http-interface>
+     62         </management-interfaces>
+
+     64     <domain-controller>
+     65         <local/>
+     66     </domain-controller>
+
+
+     67     <interfaces>
+     68         <interface name="management">
+     69             <inet-address value="${jboss.bind.address.management:192.168.0.106}"/>
+     70         </interface>
+     71         <interface name="public">
+     72             <inet-address value="${jboss.bind.address:192.168.0.106}"/>
+     73         </interface>
+     74     </interfaces>
+
+
+[root@localhost configuration]# ps -ef |grep -i java
+root       2454   2366  0 11:16 pts/1    00:00:02 java -D[Process Controller] -server -Xms64m -Xmx512m -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -Dorg.jboss.boot.log.file=/ql/jboss-eap-7.2/Node1domain/log/process-controller.log -Dlogging.configuration=file:/ql/jboss-eap-7.2/Node1domain/configuration/logging.properties -jar /opt/jboss/jboss-modules.jar -mp /opt/jboss/modules org.jboss.as.process-controller -jboss-home /opt/jboss -jvm java -mp /opt/jboss/modules -- -Dorg.jboss.boot.log.file=/ql/jboss-eap-7.2/Node1domain/log/host-controller.log -Dlogging.configuration=file:/ql/jboss-eap-7.2/Node1domain/configuration/logging.properties -server -Xms64m -Xmx512m -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -- -default-jvm java --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain
+root       2466   2454  0 11:16 pts/1    00:00:10 java -D[Host Controller] -Dorg.jboss.boot.log.file=/ql/jboss-eap-7.2/Node1domain/log/host-controller.log -Dlogging.configuration=file:/ql/jboss-eap-7.2/Node1domain/configuration/logging.properties -server -Xms64m -Xmx512m -XX:MaxMetaspaceSize=256m -Djava.net.preferIPv4Stack=true -Djboss.modules.system.pkgs=org.jboss.byteman -Djava.awt.headless=true -jar /opt/jboss/jboss-modules.jar -mp /opt/jboss/modules org.jboss.as.host-controller -mp /opt/jboss/modules --pc-address 127.0.0.1 --pc-port 34747 -default-jvm java --domain-config=Node1_domain.xml --host-config=Node1_host-master.xml -Djboss.domain.base.dir=/opt/jboss/Node1domain -Djboss.home.dir=/opt/jboss
+
+
+Active Internet connections (servers and established)
+Proto Recv-Q Send-Q Local Address           Foreign Address         State       PID/Program name
+tcp        0      0 192.168.0.106:9990      0.0.0.0:*               LISTEN      1971/java
+tcp        0      0 127.0.0.1:34824         0.0.0.0:*               LISTEN      1959/java
+tcp        0      0 192.168.0.106:9999      0.0.0.0:*               LISTEN      1971/java
+
+
+[root@localhost configuration]# firewall-cmd --add-port=9990/tcp --permanent
+Warning: ALREADY_ENABLED: 9990:tcp
+success
+[root@localhost configuration]# firewall-cmd --add-port=9999/tcp --permanent
+Warning: ALREADY_ENABLED: 9999:tcp
+success
+[root@localhost configuration]# firewall-cmd --reload
+
+
+
+
+On Jboss Node - jboss setup
+Copy domain dir with Node2domain
+[root@localhost bin]# cd /opt/jboss/
+[root@localhost jboss]# ll
+total 512
+drwxrwxr-x. 3 root root     27 Jan  7  2019 appclient
+drwxrwxr-x. 4 root root   4096 Dec  5 11:08 bin
+drwxrwxr-x. 5 root root     52 Jan  7  2019 docs
+drwxrwxr-x. 4 root root     38 Jan  7  2019 domain_org
+-rw-rw-r--. 1 root root    419 Jan  7  2019 JBossEULA.txt
+-rw-rw-r--. 1 root root 480958 Jan  7  2019 jboss-modules.jar
+-rw-rw-r--. 1 root root  26530 Jan  7  2019 LICENSE.txt
+drwxrwxr-x. 3 root root     44 Jan  7  2019 migration
+drwxrwxr-x. 3 root root     20 Jan  7  2019 modules
+drwxrwxr-x. 7 root root     76 Dec  5 10:28 Node2domain
+drwxrwxr-x. 6 root root     68 Jan  7  2019 standalone
+-rw-rw-r--. 1 root root     64 Jan  7  2019 version.txt
+drwxrwxr-x. 4 root root    173 Jan  7  2019 welcome-conte
+
+
+[root@localhost bin]# cat StartNode2.sh
+#!/bin/sh
+
+./domain.sh -domain-config=Node2_domain.xml --host-config=Node2_host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain -Djboss.domain.master.address=192.168.0.106
+
+
+#nohup su - u root ./domain.sh -domain-config=domain.xml --host-config=host.xml &
+#noup su -u root  EAP_HOME/bin/domain.sh --domain-config=Node2_domain.xml --host-config=Node2_host.xml -Djboss.domain.base.dir=/opt/jboss/Node2domain
+#./add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node2domain/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties
+#./domain.sh -domain-config=Node2_domain.xml --host-config=Node2_host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain -Djboss.domain.master.address=192.168.0.106 -Djboss.management.native.port=9999
+
+
+
+[root@localhost jboss]# cd Node2domain/configuration/
+[root@localhost configuration]# ll
+total 304
+-rw-------. 1 root root    710 Jan  7  2019 application-roles.properties
+-rw-------. 1 root root    933 Dec  5 11:17 application-users.properties
+-rw-rw-r--. 1 root root   1528 Jan  7  2019 default-server-logging.properties
+-rw-rw-r--. 1 root root 116192 Jan  7  2019 domain.xml
+-rw-rw-r--. 1 root root   8593 Jan  7  2019 host-master.xml
+-rw-rw-r--. 1 root root   9362 Jan  7  2019 host-slave.xml
+-rw-rw-r--. 1 root root   9171 Jan  7  2019 host.xml
+drwxr-xr-x. 4 root root    139 Dec  5 11:46 host_xml_history
+-rw-rw-r--. 1 root root   2328 Jan  7  2019 logging.properties
+-rw-------. 1 root root    669 Jan  7  2019 mgmt-groups.properties
+-rw-------. 1 root root   1105 Dec  5 10:28 mgmt-users.properties
+-rw-rw-r--. 1 root root 116192 Jan  7  2019 Node2_domain.xml
+-rw-rw-r--. 1 root root   9851 Dec  5 11:27 Node2_host-slave.xml
+[root@localhost configuration]# mkdir OrgDir
+[root@localhost configuration]# mv domain.xml host-master.xml host-slave.xml host.xml OrgDir/
+[root@localhost configuration]# ll
+total 152
+-rw-------. 1 root root    710 Jan  7  2019 application-roles.properties
+-rw-------. 1 root root    933 Dec  5 11:17 application-users.properties
+-rw-rw-r--. 1 root root   1528 Jan  7  2019 default-server-logging.properties
+drwxr-xr-x. 4 root root    139 Dec  5 11:46 host_xml_history
+-rw-rw-r--. 1 root root   2328 Jan  7  2019 logging.properties
+-rw-------. 1 root root    669 Jan  7  2019 mgmt-groups.properties
+-rw-------. 1 root root   1105 Dec  5 10:28 mgmt-users.properties
+-rw-rw-r--. 1 root root 116192 Jan  7  2019 Node2_domain.xml
+-rw-rw-r--. 1 root root   9851 Dec  5 11:27 Node2_host-slave.xml
+drwxr-xr-x. 2 root root     85 Dec  5 11:49 OrgDir
+[root@localhost configuration]#
+
+[root@localhost configuration]# vi Node2_host-slave.xml
+      3 <host xmlns="urn:jboss:domain:8.0" name="Node2">
+
+     10         <security-realms>
+     11             <security-realm name="ManagementRealm">
+     12                 <server-identities>
+     13                  <!--   <secret value="c2xhdmVfdXMzcl9wYXNzd29yZA=="/>  -->
+     14                      <secret value="cmVkaGF0QDE=" />
+     15                 </server-identities>
+
+
+     58         <management-interfaces>
+     59             <http-interface security-realm="ManagementRealm">
+     60                 <http-upgrade enabled="true"/>
+     61                 <socket interface="management" port="${jboss.management.http.port:9990}"/>
+     62             </http-interface>
+     63           <native-interface security-realm="ManagementRealm">
+     64               <socket interface="management" port="${jboss.management.native.port:9999}"/>
+     65          </native-interface>
+     66         </management-interfaces>
+     67     </management>
+     68     <domain-controller>
+     69       <remote host="${jboss.domain.master.address:192.168.0.106}" port="${jboss.domain.master.port:9999}"  username="admin" security-realm="ManagementRealm"/>
+     70
+     71 <!--
+     72       <remote security-realm="ManagementRealm">
+     73         <discovery-options>
+     74        <static-discovery name="primary" protocol="${jboss.domain.master.protocol:remote+http}" host="${jboss.domain.master.address:192.168.0.106}" port="${jboss        .domain.master.port:9999}"  username="admin" security-realm="ManagementRealm"/>
+     75             </discovery-options>
+     76         </remote>
+     77 -->
+     78     </domain-controller>
+     79     <interfaces>
+     80         <interface name="management">
+     81             <inet-address value="${jboss.bind.address.management:192.168.0.108}"/>
+     82         </interface>
+     83         <interface name="public">
+     84             <inet-address value="${jboss.bind.address:192.168.0.108}"/>
+     85         </interface>
+     86     </interfaces>
+    <servers>
+        <server name="server-one" group="main-server-group"/>
+        <server name="server-two" group="other-server-group">
+            <socket-bindings port-offset="150"/>
+        </server>
+    </servers>
+
+
+----------
+
+
+/opt/jboss/Node2domain_2/configuration
+
+
+#!/bin/sh
+
+./domain.sh -domain-config=Node2_2-domain.xml --host-config=Node2_2-host-slave.xml  -Djboss.domain.base.dir=/opt/jboss/Node2domain_2 -Djboss.domain.master.address=192.168.0.106
+
+./add-user.sh -a -u admin -p redhat@1 -sc /opt/jboss/Node2domain_2/configuration/ -up mgmt-users.properties -gp mgmt-groups.properties
+
+    <servers>
+        <server name="server-three" group="main-server-group">
+            <socket-bindings port-offset="100"/>
+        </server>
+        <server name="server-four" group="other-server-group">
+            <socket-bindings port-offset="250"/>
+        </server>
+    </servers>
+
+
+
+
+
+
+
+logrotate -f /etc/logrotate.d/jboss_facility
+/opt/jboss/Node2domain/servers/server-one/log/
+
+.yyyy-MM-dd_HH-mm
+
+
+/opt/jboss/Node2domain/servers/server-one/log
+/opt/jboss/Node2domain_2/servers/server-three/log
+
+
+https://access.redhat.com/solutions/384393
+
+     <custom-handler name="PERIODIC_SIZE" class="org.jboss.logmanager.handlers.PeriodicSizeRotatingFileHandler" module="org.jboss.logmanager">
+            <formatter>
+                <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
+            </formatter>
+            <properties>
+                <property name="autoFlush" value="true"/>
+                <property name="append" value="true"/>
+                <property name="rotateSize" value="20000"/>
+                <property name="maxBackupIndex" value="3"/>
+                <property name="suffix" value=".yyyy-MM-dd"/>
+                <property name="fileName" value="${jboss.server.log.dir}/server.log"/>
+            </properties>
+        </custom-handler>
